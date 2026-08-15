@@ -15,10 +15,41 @@ from backend.api.routes.health import router as health_router
 from backend.api.routes.scan import router as scan_router
 from backend.api.routes.metrics import router as metrics_router
 
+from starlette.types import ASGIApp, Scope, Receive, Send
+
 # Base paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = BASE_DIR / "static"
 PUBLIC_DIR = BASE_DIR.parent / "public"
+
+
+class VercelPathMiddleware:
+    """
+    ASGI middleware to restore the original request path when running behind
+    Vercel serverless rewrites.
+    """
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] == "http":
+            headers = dict(scope.get("headers", []))
+            # Vercel passes the original matched path in x-matched-path or x-vercel-matched-path
+            matched = headers.get(b"x-matched-path") or headers.get(b"x-vercel-matched-path")
+            if matched:
+                path_str = matched.decode("latin1", errors="ignore")
+                path_only = path_str.split("?")[0]
+                if path_only:
+                    scope["path"] = path_only
+            else:
+                path = scope.get("path", "")
+                if path.startswith("/api/index.py"):
+                    scope["path"] = path[len("/api/index.py"):] or "/"
+                elif path.startswith("/api/index"):
+                    scope["path"] = path[len("/api/index"):] or "/"
+
+        await self.app(scope, receive, send)
+
 
 app = FastAPI(
     title="AdAIPS",
@@ -28,7 +59,8 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# CORS middleware
+# Vercel path rewriting & CORS middlewares
+app.add_middleware(VercelPathMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -37,12 +69,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Direct routes (root level)
+# Direct routes (root level: /scan, /health, /metrics)
 app.include_router(health_router)
 app.include_router(scan_router)
 app.include_router(metrics_router)
 
-# Versioned API routes (/api/v1)
+# API routes (/api/scan, /api/health, /api/metrics)
+app.include_router(health_router, prefix="/api")
+app.include_router(scan_router, prefix="/api")
+app.include_router(metrics_router, prefix="/api")
+
+# Versioned API routes (/api/v1/scan, /api/v1/health, /api/v1/metrics)
 app.include_router(health_router, prefix="/api/v1")
 app.include_router(scan_router, prefix="/api/v1")
 app.include_router(metrics_router, prefix="/api/v1")
