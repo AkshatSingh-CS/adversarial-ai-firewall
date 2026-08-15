@@ -28,6 +28,7 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "structlog>=24.1.0",
     "loguru>=0.7.2",
+    "httpx>=0.27.0",
     "anthropic>=0.58.0",
 ]
 
@@ -35,3 +36,8 @@ dependencies = [
 Homepage = "https://github.com/AkshatSingh-CS/Adversarial-AI-Prompt-Scanner"
 Repository = "https://github.com/AkshatSingh-CS/Adversarial-AI-Prompt-Scanner.git"
 Issues = "https://github.com/AkshatSingh-CS/Adversarial-AI-Prompt-Scanner/issues"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

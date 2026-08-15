@@ -18,6 +18,7 @@ from backend.api.routes.metrics import router as metrics_router
 # Base paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = BASE_DIR / "static"
+PUBLIC_DIR = BASE_DIR.parent / "public"
 
 app = FastAPI(
     title="AdAIPS",
@@ -46,9 +47,11 @@ app.include_router(health_router, prefix="/api/v1")
 app.include_router(scan_router, prefix="/api/v1")
 app.include_router(metrics_router, prefix="/api/v1")
 
-# Mount static files directory
+# Mount static files directory (check backend/static then public/static)
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+elif (PUBLIC_DIR / "static").exists():
+    app.mount("/static", StaticFiles(directory=str(PUBLIC_DIR / "static")), name="static")
 
 
 @app.get("/", include_in_schema=False)
@@ -57,6 +60,9 @@ async def serve_dashboard():
     Serve the interactive web dashboard.
     """
     index_file = STATIC_DIR / "index.html"
+    if not index_file.exists() and (PUBLIC_DIR / "index.html").exists():
+        index_file = PUBLIC_DIR / "index.html"
+
     if index_file.exists():
         return FileResponse(str(index_file))
     return {

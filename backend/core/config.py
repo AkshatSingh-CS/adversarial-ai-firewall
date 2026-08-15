@@ -36,14 +36,17 @@ class Settings(BaseSettings):
     SEMANTIC_THRESHOLD: float = 0.70
 
     # ==========================================================
-    # Anthropic
+    # LLM & OpenRouter / Anthropic
     # ==========================================================
 
+    OPENROUTER_API_KEY: str = Field(default="")
+    OPENROUTER_MODEL: str = "anthropic/claude-3.5-sonnet"
+    OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
+
     ANTHROPIC_API_KEY: str = Field(default="")
-
     ANTHROPIC_MODEL: str = "claude-sonnet-4-20250514"
-
     ANTHROPIC_TIMEOUT: int = 30
+    LLM_TIMEOUT: int = 30
 
     # ==========================================================
     # Batch Processing

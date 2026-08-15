@@ -63,8 +63,10 @@ class SemanticDetector:
         prompt: str,
     ) -> list[ThreatMatch]:
         """
-        Analyze a prompt semantically using Claude.
+        Analyze a prompt semantically using the configured LLM.
         """
+        if not self.client.is_configured:
+            return []
 
         analysis_prompt = SEMANTIC_ANALYSIS_PROMPT.format(
             prompt=prompt,
@@ -75,9 +77,19 @@ class SemanticDetector:
                 analysis_prompt,
             )
 
+            # Strip markdown code fences if model enclosed JSON in ```json ... ```
+            cleaned_response = response.strip()
+            if "```" in cleaned_response:
+                lines = cleaned_response.splitlines()
+                json_lines = [
+                    l for l in lines 
+                    if not l.strip().startswith("```")
+                ]
+                cleaned_response = "\n".join(json_lines).strip()
+
             result = (
                 LLMAnalysisResult.model_validate_json(
-                    response,
+                    cleaned_response,
                 )
             )
 

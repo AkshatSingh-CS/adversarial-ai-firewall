@@ -53,17 +53,17 @@ RISK_WEIGHTS = {
 
 REGEX_PATTERNS = {
     PROMPT_INJECTION: [
-        r"ignore\s+(all\s+)?previous\s+instructions?",
+        r"ignore\s+(all\s+)?(previous|prior|above|existing)\s+(instructions?|rules?|guidelines?|prompts?|constraints?)",
         r"ignore\s+everything\s+above",
-        r"disregard\s+previous\s+instructions?",
-        r"forget\s+(all\s+)?previous\s+instructions?",
+        r"disregard\s+(all\s+)?(previous|prior|above|existing)\s+(instructions?|rules?|guidelines?|safety\s+rules?|prompts?|constraints?)",
+        r"forget\s+(all\s+)?(previous|prior|above|existing)\s+(instructions?|rules?|guidelines?|prompts?|constraints?)",
+        r"bypass\s+(safety|guardrails?|filters?|restrictions?)",
     ],
 
     SYSTEM_PROMPT_EXTRACTION: [
-        r"reveal\s+(your\s+)?system\s+prompt",
-        r"show\s+(your\s+)?system\s+prompt",
-        r"display\s+(your\s+)?system\s+prompt",
-        r"print\s+(your\s+)?hidden\s+prompt",
+        r"(reveal|show|display|print|output|leak|share|give(\s+me)?)\s+(all\s+)?(your\s+|the\s+)?(internal\s+|hidden\s+|initial\s+|secret\s+|developer\s+|core\s+)?(system\s+)?(prompts?|instructions?|rules?|directives?|preamble)",
+        r"(what\s+(is|are)\s+(your|the))\s+(hidden|internal|system|initial)\s+(prompt|instructions?|rules?)",
+        r"print\s+(your\s+)?(hidden|system|initial)\s+prompt",
     ],
 
     JAILBREAK: [
@@ -71,39 +71,45 @@ REGEX_PATTERNS = {
         r"developer\s+mode",
         r"jailbreak",
         r"do\s+anything\s+now",
+        r"unrestricted\s+mode",
+        r"maximum\s+jailbreak",
     ],
 
     ROLE_MANIPULATION: [
         r"you\s+are\s+now",
         r"pretend\s+to\s+be",
-        r"act\s+as",
+        r"act\s+as(\s+an?)?",
         r"roleplay\s+as",
+        r"from\s+now\s+on\s+you\s+are",
     ],
 
     INSTRUCTION_OVERRIDE: [
         r"forget\s+everything",
-        r"override\s+your\s+instructions",
-        r"new\s+instructions",
-        r"replace\s+your\s+instructions",
+        r"override\s+(all\s+)?(your\s+)?instructions?",
+        r"new\s+instructions\s*:",
+        r"replace\s+(your\s+)?instructions?",
+        r"disregard\s+all\s+rules?",
     ],
 
     PROMPT_LEAKAGE: [
-        r"repeat\s+your\s+prompt",
-        r"repeat\s+your\s+instructions",
-        r"output\s+your\s+system\s+prompt",
+        r"repeat\s+(your\s+)?prompt",
+        r"repeat\s+(your\s+)?instructions?",
+        r"output\s+(your\s+)?system\s+prompt",
+        r"echo\s+(your\s+)?initial\s+prompt",
     ],
 
     ENCODING_OBFUSCATION: [
-        r"base64",
-        r"hexadecimal",
-        r"rot13",
+        r"\bbase64\b",
+        r"\bhexadecimal\b",
+        r"\brot13\b",
         r"unicode\s+escape",
     ],
 
     DATA_EXFILTRATION: [
-        r"api\s+key",
-        r"secret\s+token",
-        r"private\s+key",
+        r"api[_\s\-]?key",
+        r"secret[_\s\-]?token",
+        r"private[_\s\-]?key",
         r"password",
+        r"aws[_\s\-]?secret",
     ],
 }

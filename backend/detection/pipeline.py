@@ -115,8 +115,12 @@ class DetectionPipeline:
         else:
             risk_level = "low"
 
-        # Block threshold at 50 or if critical threat detected
-        blocked = risk_score >= 50 or any(t.severity == "critical" for t in threats)
+        # Block threshold at 50 or if critical/high severity threat detected with high confidence
+        blocked = (
+            risk_score >= 50
+            or any(t.severity == "critical" for t in threats)
+            or any(t.severity == "high" and t.confidence >= 0.7 for t in threats)
+        )
 
         return (
             round(risk_score, 1),
@@ -217,3 +221,6 @@ class DetectionPipeline:
         })
 
         return response
+
+    # Backward compatibility alias
+    scan_prompt = scan
