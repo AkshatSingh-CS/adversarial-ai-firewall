@@ -4,6 +4,7 @@ Health endpoints.
 
 from fastapi import APIRouter
 
+from backend.llm import LLMClient
 from backend.models import HealthResponse
 
 router = APIRouter(tags=["Health"])
@@ -18,4 +19,10 @@ async def health() -> HealthResponse:
     """
     Basic health endpoint.
     """
-    return HealthResponse(status="healthy")
+    llm_client = LLMClient()
+    return HealthResponse(
+        status="healthy",
+        llm_provider=llm_client.provider,
+        llm_model=llm_client.model,
+        semantic_analysis_configured=llm_client.is_configured,
+    )

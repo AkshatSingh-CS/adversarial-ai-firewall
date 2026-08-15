@@ -1,7 +1,7 @@
 """
 Semantic adversarial prompt detector.
 
-Uses Claude to analyze prompts for sophisticated
+Uses the configured LLM (NVIDIA Nemotron by default) to analyze prompts for sophisticated
 adversarial behavior that cannot be reliably
 detected using regular expressions.
 """
@@ -13,7 +13,7 @@ from typing import Literal, TypeAlias
 from pydantic import ValidationError
 
 from backend.detection.prompts import SEMANTIC_ANALYSIS_PROMPT
-from backend.llm import AnthropicClient
+from backend.llm import LLMClient
 from backend.llm.models import LLMAnalysisResult
 from backend.models.response_models import ThreatMatch
 
@@ -39,7 +39,7 @@ class SemanticDetector:
         """
         Initialize the semantic detector.
         """
-        self.client = AnthropicClient()
+        self.client = LLMClient()
 
     @staticmethod
     def _normalize_severity(value: str | None) -> Severity:

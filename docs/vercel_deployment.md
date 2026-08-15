@@ -24,7 +24,7 @@ This guide walks you through deploying **AdAIPS (Adversarial AI Prompt Scanner &
                                                                                    │
                                                                    ┌───────────────┴───────────────┐
                                                                    ▼                               ▼
-                                                        Deterministic Pipeline           OpenRouter / Anthropic
+                                                        Deterministic Pipeline           NVIDIA Nemotron 3 Ultra
                                                          (Regex & Heuristics)              (Semantic LLM Layer)
 ```
 
@@ -38,7 +38,7 @@ This guide walks you through deploying **AdAIPS (Adversarial AI Prompt Scanner &
 
 1. A [Vercel account](https://vercel.com/signup).
 2. [Vercel CLI](https://vercel.com/docs/cli) installed (`npm i -g vercel`) OR a linked GitHub repository.
-3. (Optional) OpenRouter API Key (`OPENROUTER_API_KEY`) or Anthropic API Key (`ANTHROPIC_API_KEY`) for Layer 3 Semantic analysis.
+3. An NVIDIA API key (`NVIDIA_API_KEY`) for the Layer 3 Nemotron semantic analysis.
 
 ---
 
@@ -81,10 +81,12 @@ This guide walks you through deploying **AdAIPS (Adversarial AI Prompt Scanner &
    - **Framework Preset:** `Other`
    - **Root Directory:** `./`
 5. Configure Environment Variables (under **Settings > Environment Variables**):
-   - `OPENROUTER_API_KEY`: *(Optional)* Your OpenRouter API Key.
-   - `OPENROUTER_MODEL`: *(Optional, default: `anthropic/claude-3.5-sonnet`)*.
-   - `ANTHROPIC_API_KEY`: *(Optional)* Your Anthropic API Key.
+   - `NVIDIA_API_KEY`: Your NVIDIA API key. Mark it as sensitive and enable it for Production (and Preview if you test preview deployments).
+   - `NVIDIA_MODEL`: `nvidia/nemotron-3-ultra-550b-a55b` (optional because this is already the default).
+   - `NVIDIA_BASE_URL`: `https://integrate.api.nvidia.com/v1` (optional because this is already the default).
 6. Click **Deploy**.
+
+Vercel environment variables are injected into the serverless Python process. The browser never receives `NVIDIA_API_KEY`; do not place it in frontend JavaScript. Redeploy after adding or changing an environment variable so the deployment receives the new value.
 
 ---
 
@@ -92,12 +94,17 @@ This guide walks you through deploying **AdAIPS (Adversarial AI Prompt Scanner &
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `OPENROUTER_API_KEY` | No | `""` | OpenRouter API Key for unified multi-model semantic analysis |
-| `OPENROUTER_MODEL` | No | `anthropic/claude-3.5-sonnet` | Model to use on OpenRouter |
-| `ANTHROPIC_API_KEY` | No | `""` | Direct Anthropic Claude API Key |
-| `ANTHROPIC_MODEL` | No | `claude-sonnet-4-20250514` | Direct Anthropic model identifier |
+| `NVIDIA_API_KEY` | Yes* | `""` | Server-side NVIDIA API key used by the semantic analysis layer |
+| `NVIDIA_MODEL` | No | `nvidia/nemotron-3-ultra-550b-a55b` | Primary NVIDIA NIM model identifier |
+| `NVIDIA_BASE_URL` | No | `https://integrate.api.nvidia.com/v1` | NVIDIA hosted NIM API base URL |
+| `NVIDIA_MAX_TOKENS` | No | `512` | Maximum completion tokens for the JSON classification |
+| `LLM_TIMEOUT` | No | `30` | Outbound LLM request timeout in seconds |
+| `OPENROUTER_API_KEY` | No | `""` | Optional fallback used only when `NVIDIA_API_KEY` is absent |
+| `ANTHROPIC_API_KEY` | No | `""` | Optional fallback used only when NVIDIA and OpenRouter keys are absent |
 | `APP_ENV` | No | `production` | Environment flag (`development` or `production`) |
 | `SEMANTIC_THRESHOLD` | No | `0.70` | Confidence threshold for semantic detection layer |
+
+\*The application can still run deterministic regex and heuristic checks without a key, but NVIDIA-powered semantic analysis requires `NVIDIA_API_KEY`.
 
 ---
 
@@ -118,9 +125,14 @@ Expected output:
   "status": "healthy",
   "service": "AdAIPS",
   "version": "0.1.0",
-  "environment": "production"
+  "environment": "production",
+  "llm_provider": "nvidia",
+  "llm_model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "semantic_analysis_configured": true
 }
 ```
+
+If `llm_provider` is `none`, confirm `NVIDIA_API_KEY` is assigned to the deployment's environment and redeploy. The health response reports configuration status but never returns the API key.
 
 ### 3. Prompt Scan API
 ```bash

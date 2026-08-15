@@ -2,7 +2,7 @@
 Pydantic models for LLM responses.
 
 These models validate structured outputs
-returned by Claude.
+returned by the configured semantic-analysis model.
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class LLMAnalysisResult(BaseModel):
     """
-    Structured response returned by Claude.
+    Structured response returned by the semantic-analysis model.
     """
 
     model_config = ConfigDict(

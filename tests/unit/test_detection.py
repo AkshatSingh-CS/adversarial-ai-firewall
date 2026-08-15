@@ -3,10 +3,51 @@ Unit tests for detection pipeline and heuristic/regex layers.
 """
 
 import pytest
+from backend.core.config import settings
 from backend.detection.regex_detector import RegexDetector
 from backend.detection.heuristics import HeuristicDetector
 from backend.detection.pipeline import DetectionPipeline
 from backend.llm.client import LLMClient
+
+
+class _FakeNvidiaResponse:
+    status_code = 200
+
+    def raise_for_status(self):
+        return None
+
+    def json(self):
+        return {
+            "choices": [
+                {
+                    "message": {
+                        "content": '{"attack_detected": false}'
+                    }
+                }
+            ]
+        }
+
+
+class _FakeHttpClient:
+    last_request = None
+
+    def __init__(self, *, timeout):
+        self.timeout = timeout
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        return False
+
+    def post(self, url, *, headers, json):
+        type(self).last_request = {
+            "url": url,
+            "headers": headers,
+            "json": json,
+            "timeout": self.timeout,
+        }
+        return _FakeNvidiaResponse()
 
 
 def test_regex_detector_catches_system_prompt_leak():
@@ -70,3 +111,34 @@ def test_llm_client_unconfigured_fallback():
     if not client.is_configured:
         with pytest.raises(ValueError):
             client.analyze_prompt("Test prompt")
+
+
+def test_nvidia_is_primary_provider(monkeypatch):
+    monkeypatch.setattr(settings, "NVIDIA_API_KEY", "nvapi-test-secret")
+    monkeypatch.setattr(settings, "OPENROUTER_API_KEY", "openrouter-test-secret")
+    monkeypatch.setattr(settings, "ANTHROPIC_API_KEY", "anthropic-test-secret")
+
+    client = LLMClient()
+
+    assert client.provider == "nvidia"
+    assert client.model == "nvidia/nemotron-3-ultra-550b-a55b"
+
+
+def test_nvidia_chat_completion_request(monkeypatch):
+    monkeypatch.setattr(settings, "NVIDIA_API_KEY", "nvapi-test-secret")
+    monkeypatch.setattr("backend.llm.client.httpx.Client", _FakeHttpClient)
+
+    client = LLMClient()
+    result = client.analyze_prompt("Classify this prompt")
+
+    request = _FakeHttpClient.last_request
+    assert result == '{"attack_detected": false}'
+    assert request["url"] == (
+        "https://integrate.api.nvidia.com/v1/chat/completions"
+    )
+    assert request["headers"]["Authorization"] == "Bearer nvapi-test-secret"
+    assert request["json"]["model"] == "nvidia/nemotron-3-ultra-550b-a55b"
+    assert request["json"]["stream"] is False
+    assert request["json"]["chat_template_kwargs"] == {
+        "enable_thinking": False
+    }

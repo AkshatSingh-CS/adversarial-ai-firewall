@@ -94,7 +94,7 @@ class ScanRequest(BaseRequest):
     )
 
     target_model: str | None = Field(
-        default=None,
+        default=settings.NVIDIA_MODEL,
         max_length=100,
         description="Target LLM that will receive the prompt after scanning."
     )

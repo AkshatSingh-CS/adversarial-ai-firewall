@@ -36,14 +36,22 @@ class Settings(BaseSettings):
     SEMANTIC_THRESHOLD: float = 0.70
 
     # ==========================================================
-    # LLM & OpenRouter / Anthropic
+    # LLM providers
     # ==========================================================
 
-    OPENROUTER_API_KEY: str = Field(default="")
+    # Primary provider: NVIDIA-hosted NIM API. Vercel injects this secret
+    # into the Python serverless runtime from Project Environment Variables.
+    NVIDIA_API_KEY: str = Field(default="", repr=False)
+    NVIDIA_MODEL: str = "nvidia/nemotron-3-ultra-550b-a55b"
+    NVIDIA_BASE_URL: str = "https://integrate.api.nvidia.com/v1"
+    NVIDIA_MAX_TOKENS: int = 512
+
+    # Optional fallback providers.
+    OPENROUTER_API_KEY: str = Field(default="", repr=False)
     OPENROUTER_MODEL: str = "anthropic/claude-3.5-sonnet"
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
 
-    ANTHROPIC_API_KEY: str = Field(default="")
+    ANTHROPIC_API_KEY: str = Field(default="", repr=False)
     ANTHROPIC_MODEL: str = "claude-sonnet-4-20250514"
     ANTHROPIC_TIMEOUT: int = 30
     LLM_TIMEOUT: int = 30
@@ -74,5 +82,3 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
-
-ENABLE_SEMANTIC_DETECTION: bool = False
