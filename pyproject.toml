@@ -37,6 +37,14 @@ Homepage = "https://github.com/AkshatSingh-CS/Adversarial-AI-Prompt-Scanner"
 Repository = "https://github.com/AkshatSingh-CS/Adversarial-AI-Prompt-Scanner.git"
 Issues = "https://github.com/AkshatSingh-CS/Adversarial-AI-Prompt-Scanner/issues"
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["backend*"]
+exclude = ["api*", "public*", "deployment*", "docs*", "tests*", "notebooks*", "training*", "redteam*", "data*", "configs*", "sdk*", "monitoring*"]
+
+[tool.setuptools.package-data]
+backend = ["static/**/*"]
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
