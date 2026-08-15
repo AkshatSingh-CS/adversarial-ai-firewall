@@ -33,7 +33,7 @@ class HealthResponse(BaseModel):
     )
 
     service: str = Field(
-        default="Adversarial AI Firewall",
+        default="AdAIPS",
         description="Service name.",
     )
 

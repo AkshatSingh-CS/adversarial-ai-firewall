@@ -5,3 +5,4 @@ pydantic-settings
 python-dotenv
 structlog
 loguru
+anthropic>=0.58.0

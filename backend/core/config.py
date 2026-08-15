@@ -1,10 +1,13 @@
 """
 Application configuration.
 
-This module provides centralized configuration management for the
-Adversarial AI Firewall project.
+Centralized configuration management for the
+Adversarial AI Firewall.
 """
 
+from functools import lru_cache
+
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,30 +16,60 @@ class Settings(BaseSettings):
     Application settings loaded from environment variables.
     """
 
-    APP_NAME: str = "Adversarial AI Firewall"
+    # ==========================================================
+    # Application
+    # ==========================================================
+
+    APP_NAME: str = "AdAIPS"
     API_VERSION: str = "v1"
     API_PREFIX: str = "/api/v1"
 
     DEBUG: bool = True
 
-    MAX_PROMPT_LENGTH: int = 10000
+    # ==========================================================
+    # Detection
+    # ==========================================================
 
-    API_KEY: str = "change-me"
+    MAX_PROMPT_LENGTH: int = 10_000
+
+    REGEX_THRESHOLD: float = 0.30
+    SEMANTIC_THRESHOLD: float = 0.70
+
+    # ==========================================================
+    # Anthropic
+    # ==========================================================
+
+    ANTHROPIC_API_KEY: str = Field(default="")
+
+    ANTHROPIC_MODEL: str = "claude-sonnet-4-20250514"
+
+    ANTHROPIC_TIMEOUT: int = 30
+
+    # ==========================================================
+    # Batch Processing
+    # ==========================================================
+
+    MAX_BATCH_SIZE: int = 50
+
+    # ==========================================================
+    # Pydantic Settings
+    # ==========================================================
 
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=True,
+        extra="ignore",
     )
-
-
-# Global settings instance
-settings = Settings()
-from functools import lru_cache
 
 
 @lru_cache
 def get_settings() -> Settings:
     """
-    Returns a cached Settings instance.
+    Return a cached Settings instance.
     """
     return Settings()
+
+
+settings = get_settings()
+
+ENABLE_SEMANTIC_DETECTION: bool = False

@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adversarial-ai-prompt-scanner"
+version = "0.1.0"
+description = "Production-grade Adversarial AI Prompt Scanner & LLM Firewall."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Akshat Singh", email = "akshat@example.com" }
+]
+keywords = [
+    "adversarial-ai",
+    "prompt-injection",
+    "llm-security",
+    "ai-firewall",
+    "jailbreak-detection",
+    "fastapi"
+]
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.28.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "python-dotenv>=1.0.0",
+    "structlog>=24.1.0",
+    "loguru>=0.7.2",
+    "anthropic>=0.58.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/AkshatSingh-CS/Adversarial-AI-Prompt-Scanner"
+Repository = "https://github.com/AkshatSingh-CS/Adversarial-AI-Prompt-Scanner.git"
+Issues = "https://github.com/AkshatSingh-CS/Adversarial-AI-Prompt-Scanner/issues"

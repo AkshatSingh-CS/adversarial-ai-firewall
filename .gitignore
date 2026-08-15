@@ -38,3 +38,6 @@ htmlcov/
 
 # Windows
 Thumbs.db
+
+# Testfox
+.testfox/

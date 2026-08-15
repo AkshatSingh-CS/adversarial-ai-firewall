@@ -1,32 +1,47 @@
 """
-Scan endpoints.
+Scan API endpoints.
+
+Receives prompts from clients and returns
+structured detection results.
 """
+
+from __future__ import annotations
 
 from fastapi import APIRouter
 
-from backend.models import ScanRequest, ScanResponse
+from backend.detection.pipeline import DetectionPipeline
+from backend.models.request_models import ScanRequest
+from backend.models.response_models import ScanResponse
 
-router = APIRouter(tags=["Scanning"])
+# ============================================================
+# Router
+# ============================================================
 
+router = APIRouter(
+    prefix="/scan",
+    tags=["Detection"],
+)
+
+# ============================================================
+# Pipeline
+# ============================================================
+
+pipeline = DetectionPipeline()
+
+# ============================================================
+# Routes
+# ============================================================
 
 @router.post(
-    "/scan",
+    "",
     response_model=ScanResponse,
-    summary="Scan a Prompt",
+    summary="Scan a prompt for adversarial attacks",
 )
-async def scan_prompt(request: ScanRequest) -> ScanResponse:
+async def scan_prompt(
+    request: ScanRequest,
+) -> ScanResponse:
     """
-    Placeholder scan endpoint.
-
-    The detection pipeline will be connected here later.
+    Scan a single prompt using the detection pipeline.
     """
 
-    return ScanResponse(
-        request_id=request.request_id,
-        blocked=False,
-        risk_score=0.0,
-        risk_level="low",
-        threats=[],
-        processing_time_ms=0.0,
-        message="Detection engine not implemented yet.",
-    )
+    return pipeline.scan(request.prompt)
