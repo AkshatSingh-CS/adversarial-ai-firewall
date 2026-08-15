@@ -157,7 +157,7 @@ class DetectionPipeline:
             metrics.record_layer_hit("heuristics")
 
         # -----------------------------------------------
-        # 3. Semantic Detection (Claude / LLM)
+        # 3. Semantic Detection (NVIDIA Nemotron / configured LLM)
         # -----------------------------------------------
         semantic_threats = self.semantic_detector.detect(prompt)
         if semantic_threats:

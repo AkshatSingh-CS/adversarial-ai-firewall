@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const payload = {
         prompt: prompt,
-        target_model: targetModelSelect ? targetModelSelect.value : "claude-3-5-sonnet",
+        target_model: targetModelSelect ? targetModelSelect.value : "nvidia/nemotron-3-ultra-550b-a55b",
         language: "en"
       };
 

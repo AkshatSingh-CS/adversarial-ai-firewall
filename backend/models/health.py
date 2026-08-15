@@ -58,6 +58,21 @@ class HealthResponse(BaseModel):
         description="Application uptime in seconds.",
     )
 
+    llm_provider: str = Field(
+        default="none",
+        description="Active semantic-analysis provider; never contains credentials.",
+    )
+
+    llm_model: str | None = Field(
+        default=None,
+        description="Active semantic-analysis model identifier.",
+    )
+
+    semantic_analysis_configured: bool = Field(
+        default=False,
+        description="Whether a server-side LLM credential was detected.",
+    )
+
     message: str = Field(
         default="Service is operating normally.",
         max_length=500,
