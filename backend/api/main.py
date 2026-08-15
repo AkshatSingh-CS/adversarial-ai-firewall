@@ -69,10 +69,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from fastapi import FastAPI, Request
+
 # Direct routes (root level: /scan, /health, /metrics)
 app.include_router(health_router)
 app.include_router(scan_router)
 app.include_router(metrics_router)
+
+
+@app.get("/debug-path")
+@app.get("/api/debug-path")
+async def debug_path(request: Request):
+    return {
+        "url_path": request.url.path,
+        "scope_path": request.scope.get("path"),
+        "raw_path": str(request.scope.get("raw_path")),
+        "root_path": request.scope.get("root_path"),
+        "headers": dict(request.headers),
+    }
 
 # API routes (/api/scan, /api/health, /api/metrics)
 app.include_router(health_router, prefix="/api")

@@ -79,6 +79,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   promptInput.addEventListener('input', updateCounters);
 
+  // Resilient API Fetch Helper (handles both /api/* and direct /* routing)
+  async function apiFetch(path, options = {}) {
+    const clean = path.replace(/^\/+/, '');
+    try {
+      let res = await fetch(`/api/${clean}`, options);
+      if (res.ok) return res;
+      if (res.status === 404) {
+        let fallback = await fetch(`/${clean}`, options);
+        if (fallback.ok) return fallback;
+      }
+      return res;
+    } catch (e) {
+      return fetch(`/${clean}`, options);
+    }
+  }
+
   // Clear button
   if (clearBtn) {
     clearBtn.addEventListener('click', () => {
@@ -113,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         language: "en"
       };
 
-      const res = await fetch('/scan', {
+      const res = await apiFetch('scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -257,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Refresh Metrics & History
   async function refreshMetrics() {
     try {
-      const res = await fetch('/metrics');
+      const res = await apiFetch('metrics');
       if (res.ok) {
         const data = await res.json();
         if (kpiTotalRequests) kpiTotalRequests.textContent = data.requests || 0;
@@ -281,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!historyTableBody) return;
 
     try {
-      const res = await fetch('/metrics/history');
+      const res = await apiFetch('metrics/history');
       if (res.ok) {
         const history = await res.json();
         if (history.length === 0) {
@@ -322,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // System Health Ping
   async function pingHealth() {
     try {
-      const res = await fetch('/health');
+      const res = await apiFetch('health');
       const healthIndicator = document.getElementById('systemHealthText');
       if (res.ok && healthIndicator) {
         healthIndicator.textContent = 'SYSTEM OPERATIONAL';
