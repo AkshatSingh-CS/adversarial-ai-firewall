@@ -3,31 +3,31 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/index.py"
+      "destination": "/api"
     },
     {
       "source": "/scan",
-      "destination": "/api/index.py"
+      "destination": "/api"
     },
     {
       "source": "/health",
-      "destination": "/api/index.py"
+      "destination": "/api"
     },
     {
       "source": "/metrics/(.*)",
-      "destination": "/api/index.py"
+      "destination": "/api"
     },
     {
       "source": "/metrics",
-      "destination": "/api/index.py"
+      "destination": "/api"
     },
     {
       "source": "/docs",
-      "destination": "/api/index.py"
+      "destination": "/api"
     },
     {
       "source": "/openapi.json",
-      "destination": "/api/index.py"
+      "destination": "/api"
     }
   ]
 }
