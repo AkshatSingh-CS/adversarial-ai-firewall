@@ -5,7 +5,7 @@ Unit tests for AdAIPS API endpoints and Vercel entry point.
 import pytest
 from fastapi.testclient import TestClient
 from backend.api.main import app
-from api.index import app as vercel_app
+from app import app as vercel_app
 
 
 @pytest.fixture

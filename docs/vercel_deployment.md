@@ -18,7 +18,7 @@ This guide walks you through deploying **AdAIPS (Adversarial AI Prompt Scanner &
                            │                                                       │
                            ▼                                                       ▼
                 ┌─────────────────────┐                                 ┌─────────────────────┐
-                │   Vercel Edge CDN   │                                 │   api/index.py      │
+                │   Vercel Edge CDN   │                                 │      app.py        │
                 │   (public/ assets)  │                                 │   (FastAPI App)     │
                 └─────────────────────┘                                 └──────────┬──────────┘
                                                                                    │
@@ -29,7 +29,7 @@ This guide walks you through deploying **AdAIPS (Adversarial AI Prompt Scanner &
 ```
 
 - **Static Assets:** `public/` directory contains `index.html`, `static/css/style.css`, and `static/js/app.js` served directly by Vercel Edge CDN at ultra-low latency.
-- **Serverless API:** Dynamic routes (`/scan`, `/health`, `/metrics`, `/docs`, `/openapi.json`) route via `vercel.json` rewrites to `api/index.py`.
+- **Serverless API:** Vercel loads the single root `app.py` entrypoint, explicitly configured under `functions` in `vercel.json`. Original paths such as `/scan`, `/health`, `/metrics`, `/docs`, and `/openapi.json` are preserved.
 - **Zero Cold Start for Heuristics:** Fast deterministic regex and heuristic layers execute with sub-millisecond overhead.
 
 ---
@@ -77,9 +77,9 @@ This guide walks you through deploying **AdAIPS (Adversarial AI Prompt Scanner &
 
 2. Navigate to [vercel.com/new](https://vercel.com/new).
 3. Import your `adversarial-ai-firewall` GitHub repository.
-4. Keep the default settings:
-   - **Framework Preset:** `Other`
-   - **Root Directory:** `./`
+4. Configure the project settings:
+   - **Framework Preset:** `FastAPI` (or leave automatic framework detection enabled).
+   - **Root Directory:** The directory containing `app.py`, `pyproject.toml`, and `vercel.json`—not the outer downloaded ZIP folder.
 5. Configure Environment Variables (under **Settings > Environment Variables**):
    - `NVIDIA_API_KEY`: Your NVIDIA API key. Mark it as sensitive and enable it for Production (and Preview if you test preview deployments).
    - `NVIDIA_MODEL`: `nvidia/nemotron-3-ultra-550b-a55b` (optional because this is already the default).
